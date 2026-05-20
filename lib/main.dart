@@ -35,10 +35,12 @@ class _LoginPageState extends State<LoginPage> {
   bool obscurePassword = true;
 
   void login() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const HomePage()),
-    );
+    if (_formKey.currentState!.validate()) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    }
   }
 
   void forgotPassword() {
