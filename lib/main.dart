@@ -14,7 +14,43 @@ class LMSApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'LMS Login',
-      theme: ThemeData(fontFamily: 'Roboto'),
+
+      // ✅ FIXED THEME (Day 2 requirement)
+      theme: ThemeData(
+        fontFamily: 'Roboto',
+
+        colorScheme: const ColorScheme.dark(
+          primary: Color(0xFF3D4FD6),
+          background: Color(0xFF1A2252),
+          surface: Color(0xFF0F1535),
+        ),
+
+        inputDecorationTheme: const InputDecorationTheme(
+          filled: true,
+          fillColor: Color(0xFF1E2D6E),
+          prefixIconColor: Color(0xFF6677AA),
+          hintStyle: TextStyle(color: Color(0xFF6677AA)),
+          border: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFF3A4580)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFF3A4580)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFF3D4FD6)),
+          ),
+        ),
+
+        textTheme: const TextTheme(
+          titleLarge: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+          bodyMedium: TextStyle(color: Colors.white),
+        ),
+      ),
+
       home: const LoginPage(),
     );
   }
@@ -34,6 +70,14 @@ class _LoginPageState extends State<LoginPage> {
 
   bool obscurePassword = true;
 
+  // ✅ FIXED: dispose controllers
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
   void login() {
     if (_formKey.currentState!.validate()) {
       Navigator.push(
@@ -44,15 +88,16 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void forgotPassword() {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text("Forgot password clicked")));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Forgot password clicked")),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A2252),
+      backgroundColor: Theme.of(context).colorScheme.background,
+
       body: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth > 800) {
@@ -65,11 +110,10 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // ---------------- DESKTOP SPLIT ----------------
+  // ---------------- DESKTOP ----------------
   Widget _desktopLayout() {
     return Row(
       children: [
-        // LEFT IMAGE SIDE
         Expanded(
           child: Container(
             color: const Color(0xFF0F1535),
@@ -81,8 +125,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         ),
-
-        // RIGHT LOGIN SIDE
         Expanded(child: Center(child: _loginBox())),
       ],
     );
@@ -118,7 +160,6 @@ class _LoginPageState extends State<LoginPage> {
   // ---------------- LOGIN BOX ----------------
   Widget _loginBox() {
     return Container(
-      width: 360,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: const Color(0xFF0F1535),
@@ -127,18 +168,13 @@ class _LoginPageState extends State<LoginPage> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // SMALL LOGO
           SvgPicture.asset('assets/lms_university_logo.svg', height: 60),
 
           const SizedBox(height: 10),
 
-          const Text(
+          Text(
             "LMS Login",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(context).textTheme.titleLarge,
           ),
 
           const SizedBox(height: 20),
@@ -151,10 +187,18 @@ class _LoginPageState extends State<LoginPage> {
                 TextFormField(
                   controller: emailController,
                   style: const TextStyle(color: Colors.white),
-                  decoration: _inputDecoration("Email", Icons.email),
+                  decoration: const InputDecoration(
+                    hintText: "Email",
+                    prefixIcon: Icon(Icons.email),
+                  ),
+
+                  // ✅ FIXED EMAIL VALIDATION
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Email is required";
+                    }
+                    if (!value.contains("@") || !value.contains(".")) {
+                      return "Enter a valid email";
                     }
                     return null;
                   },
@@ -167,7 +211,9 @@ class _LoginPageState extends State<LoginPage> {
                   controller: passwordController,
                   obscureText: obscurePassword,
                   style: const TextStyle(color: Colors.white),
-                  decoration: _inputDecoration("Password", Icons.lock).copyWith(
+                  decoration: InputDecoration(
+                    hintText: "Password",
+                    prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
                       onPressed: () {
                         setState(() {
@@ -208,7 +254,6 @@ class _LoginPageState extends State<LoginPage> {
 
           const SizedBox(height: 10),
 
-          // LOGIN BUTTON
           SizedBox(
             width: double.infinity,
             height: 45,
@@ -230,29 +275,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  // ---------------- INPUT STYLE ----------------
-  InputDecoration _inputDecoration(String hint, IconData icon) {
-    return InputDecoration(
-      hintText: hint,
-      hintStyle: const TextStyle(color: Color(0xFF6677AA)),
-      prefixIcon: Icon(icon, color: const Color(0xFF6677AA)),
-      filled: true,
-      fillColor: const Color(0xFF1E2D6E),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Color(0xFF3A4580)),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Color(0xFF3A4580)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Color(0xFF3D4FD6)),
       ),
     );
   }
