@@ -30,6 +30,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   bool obscurePassword = true;
 
@@ -136,32 +137,53 @@ class _LoginPageState extends State<LoginPage> {
 
           const SizedBox(height: 20),
 
-          // EMAIL
-          TextField(
-            controller: emailController,
-            style: const TextStyle(color: Colors.white),
-            decoration: _inputDecoration("Email", Icons.email),
-          ),
-
-          const SizedBox(height: 12),
-
-          // PASSWORD
-          TextField(
-            controller: passwordController,
-            obscureText: obscurePassword,
-            style: const TextStyle(color: Colors.white),
-            decoration: _inputDecoration("Password", Icons.lock).copyWith(
-              suffixIcon: IconButton(
-                onPressed: () {
-                  setState(() {
-                    obscurePassword = !obscurePassword;
-                  });
-                },
-                icon: Icon(
-                  obscurePassword ? Icons.visibility_off : Icons.visibility,
-                  color: const Color(0xFF6677AA),
+          Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                // EMAIL
+                TextFormField(
+                  controller: emailController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: _inputDecoration("Email", Icons.email),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Email is required";
+                    }
+                    return null;
+                  },
                 ),
-              ),
+
+                const SizedBox(height: 12),
+
+                // PASSWORD
+                TextFormField(
+                  controller: passwordController,
+                  obscureText: obscurePassword,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: _inputDecoration("Password", Icons.lock).copyWith(
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          obscurePassword = !obscurePassword;
+                        });
+                      },
+                      icon: Icon(
+                        obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: const Color(0xFF6677AA),
+                      ),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Password is required";
+                    }
+                    return null;
+                  },
+                ),
+              ],
             ),
           ),
 
