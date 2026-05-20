@@ -94,18 +94,22 @@ class _LoginPageState extends State<LoginPage> {
       child: Column(
         children: [
           Container(
-            height: 220,
-            width: double.infinity,
-            color: const Color(0xFF0F1535),
-            child: Center(
-              child: SvgPicture.asset(
-                'assets/lms_cartoon_illustration.svg',
-                height: 180,
-              ),
+            margin: const EdgeInsets.only(top: 30),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0F1535),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: SvgPicture.asset(
+              'assets/lms_cartoon_illustration.svg',
+              height: 120,
             ),
           ),
           const SizedBox(height: 20),
-          _loginBox(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: _loginBox(),
+          ),
         ],
       ),
     );
