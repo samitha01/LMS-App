@@ -22,7 +22,8 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FB),
 
-      appBar: AppBar(
+      appBar: currentIndex == 0
+          ? AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
@@ -38,7 +39,8 @@ class _HomePageState extends State<HomePage> {
             icon: const Icon(Icons.logout),
           ),
         ],
-      ),
+      )
+          : null,
 
       body: IndexedStack(
         index: currentIndex,
