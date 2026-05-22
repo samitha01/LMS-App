@@ -1,14 +1,27 @@
 import 'package:flutter/material.dart';
+import 'course_list_page.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int currentIndex = 0;
+
+  void _onNavigate(int index) {
+    setState(() {
+      currentIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FB),
 
-      // APP BAR
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
@@ -17,8 +30,6 @@ class HomePage extends StatelessWidget {
           "LMS Dashboard",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-
-        // Navigator.pop
         actions: [
           IconButton(
             onPressed: () {
@@ -29,260 +40,219 @@ class HomePage extends StatelessWidget {
         ],
       ),
 
-      // BODY
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // GREETING SECTION
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Hello",
-                      style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      "Ready to continue learning?",
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 15,
-                      ),
-                    ),
-                  ],
-                ),
+      body: IndexedStack(
+        index: currentIndex,
+        children: [
+          DashboardView(onNavigate: _onNavigate),
+          const CourseListPage(),
+          const Center(child: Text("Progress Page")),
+          const Center(child: Text("Profile Page")),
+        ],
+      ),
 
-                CircleAvatar(
-                  radius: 24,
-                  backgroundColor: Colors.indigo.shade100,
-                  child: const Icon(
-                    Icons.person,
-                    color: Colors.indigo,
-                    size: 28,
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: currentIndex,
+        onTap: (index) {
+          setState(() {
+            currentIndex = index;
+          });
+        },
+        selectedItemColor: Colors.indigo,
+        unselectedItemColor: Colors.grey,
+        backgroundColor: Colors.white,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.menu_book), label: "Courses"),
+          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: "Progress"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+        ],
+      ),
+    );
+  }
+}
+
+class DashboardView extends StatelessWidget {
+  final Function(int) onNavigate;
+
+  const DashboardView({
+    super.key,
+    required this.onNavigate,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // GREETING SECTION (RESTORED STYLE)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Hello",
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    "Ready to continue learning?",
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 15,
+                    ),
+                  ),
+                ],
+              ),
+
+              CircleAvatar(
+                radius: 24,
+                backgroundColor: Colors.indigo.shade100,
+                child: const Icon(
+                  Icons.person,
+                  color: Colors.indigo,
+                  size: 28,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 25),
+
+          // PROGRESS CARD (RESTORED STYLE)
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.indigo.shade900,
+                  Colors.indigo.shade700,
+                ],
+              ),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Course Progress",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  "3 of 10 lessons completed",
+                  style: TextStyle(color: Colors.white70),
+                ),
+                const SizedBox(height: 18),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: const LinearProgressIndicator(
+                    value: 0.3,
+                    minHeight: 10,
+                    backgroundColor: Colors.white24,
+                    valueColor: AlwaysStoppedAnimation(Colors.white),
                   ),
                 ),
               ],
             ),
+          ),
 
-            const SizedBox(height: 25),
+          const SizedBox(height: 28),
 
-            // PROGRESS CARD
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.indigo.shade900,
-                    Colors.indigo.shade700,
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Course Progress",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  const Text(
-                    "3 of 10 lessons completed",
-                    style: TextStyle(
-                      color: Colors.white70,
-                    ),
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: LinearProgressIndicator(
-                      value: 0.3,
-                      minHeight: 10,
-                      backgroundColor: Colors.white24,
-                      valueColor: const AlwaysStoppedAnimation(
-                        Colors.white,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _progressItem("Courses", "00"),
-                      _progressItem("Completed", "00"),
-                      _progressItem("Hours", "00"),
-                    ],
-                  ),
-                ],
-              ),
+          const Text(
+            "Categories",
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
             ),
+          ),
 
-            const SizedBox(height: 28),
+          const SizedBox(height: 15),
 
-            // CATEGORIES
-            const Text(
-              "Categories",
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 15),
-
-            SizedBox(
-              height: 110,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: const [
-                  _CategoryCard(
-                    icon: Icons.phone_android,
-                    title: "Flutter",
-                  ),
-                  _CategoryCard(
-                    icon: Icons.palette,
-                    title: "UI/UX",
-                  ),
-                  _CategoryCard(
-                    icon: Icons.code,
-                    title: "Dart",
-                  ),
-                  _CategoryCard(
-                    icon: Icons.cloud,
-                    title: "Firebase",
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            // CONTINUE LEARNING
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          SizedBox(
+            height: 110,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
               children: const [
-                Text(
-                  "Continue Learning",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                _CategoryCard(icon: Icons.phone_android, title: "Flutter"),
+                _CategoryCard(icon: Icons.palette, title: "UI/UX"),
+                _CategoryCard(icon: Icons.code, title: "Dart"),
+                _CategoryCard(icon: Icons.cloud, title: "Firebase"),
+              ],
+            ),
+          ),
 
-                Text(
+          const SizedBox(height: 30),
+
+          // CONTINUE LEARNING HEADER (RESTORED)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Continue Learning",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              GestureDetector(
+                onTap: () {
+                  // see all disabled, connect later.
+                },
+                child: const Text(
                   "See All",
                   style: TextStyle(
                     color: Colors.indigo,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-              ],
-            ),
-
-            const SizedBox(height: 15),
-
-            const _CourseCard(
-              title: "Flutter Basics",
-              lesson: "Lesson 4",
-              progress: 0.7,
-            ),
-
-            const _CourseCard(
-              title: "UI Design Principles",
-              lesson: "Lesson 2",
-              progress: 0.4,
-            ),
-
-            const _CourseCard(
-              title: "Dart Fundamentals",
-              lesson: "Lesson 6",
-              progress: 0.8,
-            ),
-
-            const _CourseCard(
-              title: "Firebase Authentication",
-              lesson: "Lesson 1",
-              progress: 0.2,
-            ),
-          ],
-        ),
-      ),
-
-      // BOTTOM NAVIGATION
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        selectedItemColor: Colors.indigo,
-        unselectedItemColor: Colors.grey,
-        backgroundColor: Colors.white,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: "Home",
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.menu_book),
-            label: "Courses",
+
+          const SizedBox(height: 15),
+
+          const _CourseCard(
+            title: "Flutter Basics",
+            lesson: "Lesson 4",
+            progress: 0.7,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: "Progress",
+          const _CourseCard(
+            title: "UI Design Principles",
+            lesson: "Lesson 2",
+            progress: 0.4,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: "Profile",
+          const _CourseCard(
+            title: "Dart Fundamentals",
+            lesson: "Lesson 6",
+            progress: 0.8,
+          ),
+          const _CourseCard(
+            title: "Firebase Authentication",
+            lesson: "Lesson 1",
+            progress: 0.2,
           ),
         ],
       ),
     );
   }
-
-  // PROGRESS ITEM
-  Widget _progressItem(String title, String value) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          title,
-          style: const TextStyle(
-            color: Colors.white70,
-          ),
-        ),
-      ],
-    );
-  }
 }
 
-// CATEGORY CARD
 class _CategoryCard extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -311,11 +281,7 @@ class _CategoryCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            size: 32,
-            color: Colors.indigo,
-          ),
+          Icon(icon, size: 32, color: Colors.indigo),
           const SizedBox(height: 10),
           Text(
             title,
@@ -330,7 +296,6 @@ class _CategoryCard extends StatelessWidget {
   }
 }
 
-// COURSE CARD
 class _CourseCard extends StatelessWidget {
   final String title;
   final String lesson;
@@ -387,27 +352,20 @@ class _CourseCard extends StatelessWidget {
                     fontSize: 16,
                   ),
                 ),
-
                 const SizedBox(height: 5),
-
                 Text(
                   lesson,
-                  style: const TextStyle(
-                    color: Colors.grey,
-                  ),
+                  style: const TextStyle(color: Colors.grey),
                 ),
-
                 const SizedBox(height: 12),
-
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: LinearProgressIndicator(
                     value: progress,
                     minHeight: 8,
                     backgroundColor: Colors.grey.shade200,
-                    valueColor: const AlwaysStoppedAnimation(
-                      Colors.indigo,
-                    ),
+                    valueColor:
+                    const AlwaysStoppedAnimation(Colors.indigo),
                   ),
                 ),
               ],

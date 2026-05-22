@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'home_page.dart';
+import 'signup_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -211,6 +212,19 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
+          TextButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SignUpPage()),
+              );
+            },
+            child: const Text(
+              "Don't have an account? Sign Up",
+              style: TextStyle(color: Color(0xFF8899CC)),
+            ),
+          ),
+
         ],
       ),
     );
