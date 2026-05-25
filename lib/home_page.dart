@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'course_list_page.dart';
+import 'assignment_page.dart';
+import 'profile_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -47,8 +49,8 @@ class _HomePageState extends State<HomePage> {
         children: [
           DashboardView(onNavigate: _onNavigate),
           const CourseListPage(),
-          const Center(child: Text("Progress Page")),
-          const Center(child: Text("Profile Page")),
+          const AssignmentPage(),
+          const ProfilePage(),
         ],
       ),
 
