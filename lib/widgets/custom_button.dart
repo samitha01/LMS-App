@@ -21,9 +21,20 @@ class CustomButton extends StatelessWidget {
 
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.indigo,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          elevation: 2,
         ),
 
-        child: Text(text),
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
     );
   }
