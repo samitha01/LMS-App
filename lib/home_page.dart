@@ -33,14 +33,6 @@ class _HomePageState extends State<HomePage> {
           "LMS Dashboard",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(Icons.logout),
-          ),
-        ],
       )
           : null,
 
