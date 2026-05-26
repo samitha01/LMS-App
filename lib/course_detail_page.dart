@@ -19,7 +19,6 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
   @override
   void initState() {
     super.initState();
-
     completedLessons = List.generate(5, (index) => false);
   }
 
@@ -64,7 +63,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
         title: Text(
           widget.course["title"] ?? "Course Details",
           style: const TextStyle(
-            color: Colors.black,
+            color: Colors.black87,
             fontWeight: FontWeight.bold,
             fontSize: 20,
           ),
@@ -80,7 +79,6 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            // VIDEO
             Container(
               height: 220,
               width: double.infinity,
@@ -104,6 +102,7 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
+                color: Colors.black87,
               ),
             ),
 
@@ -118,12 +117,14 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
 
             Text(
               widget.course["description"] ?? "",
-              style: const TextStyle(height: 1.5),
+              style: const TextStyle(
+                height: 1.5,
+                color: Colors.black87,
+              ),
             ),
 
             const SizedBox(height: 25),
 
-            // PROGRESS BAR (NEW)
             LinearProgressIndicator(
               value: progress,
               minHeight: 10,
@@ -137,7 +138,10 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
 
             Text(
               "${(progress * 100).toInt()}% completed",
-              style: const TextStyle(fontWeight: FontWeight.w600),
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
             ),
 
             const SizedBox(height: 25),
@@ -152,13 +156,13 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
 
             const SizedBox(height: 15),
 
-            // LESSON LIST (UPDATED)
             Column(
               children: List.generate(lessons.length, (index) {
                 return GestureDetector(
                   onTap: () {
                     setState(() {
-                      completedLessons[index] = !completedLessons[index];
+                      completedLessons[index] =
+                      !completedLessons[index];
                     });
                   },
 
@@ -184,7 +188,6 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
                         Container(
                           height: 45,
                           width: 45,
-
                           decoration: BoxDecoration(
                             color: completedLessons[index]
                                 ? Colors.green.shade100
@@ -225,7 +228,6 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
 
             const SizedBox(height: 30),
 
-            // MAIN BUTTON (UPDATED)
             SizedBox(
               width: double.infinity,
               height: 55,
@@ -233,8 +235,20 @@ class _CourseDetailPageState extends State<CourseDetailPage> {
               child: ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    for (int i = 0; i < completedLessons.length; i++) {
-                      completedLessons[i] = true;
+                    if (progress == 0) {
+                      completedLessons[0] = true;
+                    } else if (progress == 1) {
+                      for (int i = 0;
+                      i < completedLessons.length;
+                      i++) {
+                        completedLessons[i] = false;
+                      }
+                    } else {
+                      int nextIndex =
+                      completedLessons.indexOf(false);
+                      if (nextIndex != -1) {
+                        completedLessons[nextIndex] = true;
+                      }
                     }
                   });
                 },
