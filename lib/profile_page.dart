@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'widgets/custom_button.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -79,7 +80,7 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Column(
           children: [
 
-            // ✅ DAY 6 ANIMATION (safe, no color change)
+            //ANIMATION
             AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               padding: const EdgeInsets.all(20),
@@ -201,8 +202,48 @@ class _ProfilePageState extends State<ProfilePage> {
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                onPressed: () {
-                  Navigator.pop(context);
+                onPressed: () async {
+                  final shouldLogout = await showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text("Logout"),
+                      content: const Text(
+                        "Are you sure you want to lpgout?",
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context, false);
+                          },
+                          child: const Text("Cancel"),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context, true);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                          ),
+                          child: const Text(
+                            "Logout",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  if (shouldLogout == true) {
+                    await Supabase.instance.client.auth.signOut();
+
+                    if (!mounted) return;
+
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/',
+                          (route) => false,
+                    );
+                  }
                 },
                 child: const Text(
                   "Logout",
