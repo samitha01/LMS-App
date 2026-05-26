@@ -1,11 +1,54 @@
 import 'package:flutter/material.dart';
 import 'widgets/custom_button.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
   @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  bool isEditing = false;
+
+  String name = "Samitha Madhushanka";
+  String email = "samitha@example.com";
+  String studentId = "IS-2021-045";
+  String university = "University of Sri Jayewardenepura";
+  String faculty = "Computing";
+  String degree = "BSc in Information Systems";
+  String semester = "Semester 4";
+  String phone = "+94 77 123 4567";
+
+  late TextEditingController nameCtrl;
+  late TextEditingController emailCtrl;
+  late TextEditingController phoneCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    nameCtrl = TextEditingController(text: name);
+    emailCtrl = TextEditingController(text: email);
+    phoneCtrl = TextEditingController(text: phone);
+  }
+
+  void toggleEdit() {
+    setState(() {
+      if (isEditing) {
+        name = nameCtrl.text;
+        email = emailCtrl.text;
+        phone = phoneCtrl.text;
+      }
+      isEditing = !isEditing;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FB),
 
@@ -21,22 +64,24 @@ class ProfilePage extends StatelessWidget {
         elevation: 0,
         actions: [
           IconButton(
-            onPressed: () {
-              // logout logic later
-            },
-            icon: const Icon(Icons.logout, color: Colors.red),
+            onPressed: toggleEdit,
+            icon: Icon(
+              isEditing ? Icons.save : Icons.edit,
+              color: Colors.indigo,
+            ),
           )
         ],
       ),
 
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(screenWidth * 0.05),
 
         child: Column(
           children: [
 
-            /// PROFILE CARD
-            Container(
+            // ✅ DAY 6 ANIMATION (safe, no color change)
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -58,9 +103,11 @@ class ProfilePage extends StatelessWidget {
 
                   const SizedBox(height: 15),
 
-                  const Text(
-                    "Samitha Madhushanka",
-                    style: TextStyle(
+                  isEditing
+                      ? TextField(controller: nameCtrl)
+                      : Text(
+                    name,
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
@@ -69,9 +116,11 @@ class ProfilePage extends StatelessWidget {
 
                   const SizedBox(height: 5),
 
-                  const Text(
-                    "samitha@example.com",
-                    style: TextStyle(color: Colors.grey),
+                  isEditing
+                      ? TextField(controller: emailCtrl)
+                      : Text(
+                    email,
+                    style: const TextStyle(color: Colors.grey),
                   ),
 
                   const SizedBox(height: 15),
@@ -80,19 +129,21 @@ class ProfilePage extends StatelessWidget {
 
                   const SizedBox(height: 10),
 
-                  _infoRow("Student ID", "IS-2021-045"),
-                  _infoRow("University", "University of Sri Jayewardenepura"),
-                  _infoRow("Faculty", "Computing"),
-                  _infoRow("Degree", "BSc in Information Systems"),
-                  _infoRow("Semester", "Semester 4"),
-                  _infoRow("Phone", "+94 77 123 4567"),
+                  _infoRow("Student ID", studentId),
+                  _infoRow("University", university),
+                  _infoRow("Faculty", faculty),
+                  _infoRow("Degree", degree),
+                  _infoRow("Semester", semester),
+
+                  isEditing
+                      ? TextField(controller: phoneCtrl)
+                      : _infoRow("Phone", phone),
                 ],
               ),
             ),
 
             const SizedBox(height: 20),
 
-            /// STATS
             Row(
               children: [
                 Expanded(child: _buildStatCard("Courses", "8")),
@@ -133,17 +184,13 @@ class ProfilePage extends StatelessWidget {
 
             const SizedBox(height: 25),
 
-            /// EDIT PROFILE (NOW USING REUSABLE BUTTON)
             CustomButton(
-              text: "Edit Profile",
-              onPressed: () {
-                // open edit screen later
-              },
+              text: isEditing ? "Save Changes" : "Edit Profile",
+              onPressed: toggleEdit,
             ),
 
             const SizedBox(height: 12),
 
-            /// LOGOUT BUTTON (STILL REAL APP FEATURE)
             SizedBox(
               width: double.infinity,
               height: 52,
@@ -173,33 +220,22 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  /// INFO ROW
   static Widget _infoRow(String title, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.grey,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
-          ),
+          Text(title, style: const TextStyle(color: Colors.grey)),
+          Text(value,
+              style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87)),
         ],
       ),
     );
   }
 
-  /// STATS CARD
   static Widget _buildStatCard(String title, String value) {
     return Container(
       padding: const EdgeInsets.all(18),
@@ -209,29 +245,19 @@ class ProfilePage extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.indigo,
-            ),
-          ),
+          Text(value,
+              style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.indigo)),
           const SizedBox(height: 5),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.grey,
-              fontSize: 12,
-            ),
-          ),
+          Text(title,
+              style: const TextStyle(fontSize: 12, color: Colors.grey)),
         ],
       ),
     );
   }
 
-  /// COURSE TILE
   static Widget _buildCourseTile(String title) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -244,13 +270,10 @@ class ProfilePage extends StatelessWidget {
         children: [
           const Icon(Icons.trending_up, color: Colors.indigo),
           const SizedBox(width: 12),
-          Text(
-            title,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
-          ),
+          Text(title,
+              style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87)),
         ],
       ),
     );
