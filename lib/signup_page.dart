@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -15,14 +15,64 @@ class _SignUpPageState extends State<SignUpPage> {
 
   final _formKey = GlobalKey<FormState>();
   bool obscurePassword = true;
+  bool isLoading = false;
 
-  void signUp() {
-    if (_formKey.currentState!.validate()) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
+  Future<void> signUp() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => isLoading = true);
+
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    final name = nameController.text.trim();
+
+    try {
+      final supabase = Supabase.instance.client;
+
+      final response = await supabase.auth.signUp(
+        email: email,
+        password: password,
+        data: {
+          'full_name': name,
+        },
+      );
+
+      if (response.user != null) {
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Signup successful! Please login"),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Signup failed"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } on AuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error: $e"),
+          backgroundColor: Colors.red,
+        ),
       );
     }
+
+    setState(() => isLoading = false);
   }
 
   @override
@@ -68,41 +118,34 @@ class _SignUpPageState extends State<SignUpPage> {
                   child: Column(
                     children: [
 
-                      // NAME
                       TextFormField(
                         controller: nameController,
                         decoration: const InputDecoration(
                           hintText: "Full Name",
                           prefixIcon: Icon(Icons.person),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Name required";
-                          }
-                          return null;
-                        },
+                        validator: (value) =>
+                        value == null || value.isEmpty
+                            ? "Name required"
+                            : null,
                       ),
 
                       const SizedBox(height: 12),
 
-                      // EMAIL
                       TextFormField(
                         controller: emailController,
                         decoration: const InputDecoration(
                           hintText: "Email",
                           prefixIcon: Icon(Icons.email),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Email required";
-                          }
-                          return null;
-                        },
+                        validator: (value) =>
+                        value == null || value.isEmpty
+                            ? "Email required"
+                            : null,
                       ),
 
                       const SizedBox(height: 12),
 
-                      // PASSWORD
                       TextFormField(
                         controller: passwordController,
                         obscureText: obscurePassword,
@@ -123,12 +166,10 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                           ),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Password required";
-                          }
-                          return null;
-                        },
+                        validator: (value) =>
+                        value == null || value.isEmpty
+                            ? "Password required"
+                            : null,
                       ),
                     ],
                   ),
@@ -140,11 +181,20 @@ class _SignUpPageState extends State<SignUpPage> {
                   width: double.infinity,
                   height: 45,
                   child: ElevatedButton(
-                    onPressed: signUp,
+                    onPressed: isLoading ? null : signUp,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF3D4FD6),
                     ),
-                    child: const Text(
+                    child: isLoading
+                        ? const SizedBox(
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                        : const Text(
                       "Sign Up",
                       style: TextStyle(color: Colors.white),
                     ),
