@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class CourseDetailPage extends StatelessWidget {
+class CourseDetailPage extends StatefulWidget {
   final Map<String, dynamic> course;
 
   const CourseDetailPage({
@@ -9,7 +9,40 @@ class CourseDetailPage extends StatelessWidget {
   });
 
   @override
+  State<CourseDetailPage> createState() => _CourseDetailPageState();
+}
+
+class _CourseDetailPageState extends State<CourseDetailPage> {
+
+  List<bool> completedLessons = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    completedLessons = List.generate(5, (index) => false);
+  }
+
+  double get progress {
+    int done = completedLessons.where((e) => e).length;
+    return done / completedLessons.length;
+  }
+
+  String get buttonText {
+    if (progress == 0) return "Start Course";
+    if (progress == 1) return "Completed 🎉";
+    return "Continue Learning";
+  }
+
+  Color get buttonColor {
+    if (progress == 1) return Colors.green;
+    if (progress > 0) return Colors.orange;
+    return Colors.indigo;
+  }
+
+  @override
   Widget build(BuildContext context) {
+
     final List<String> lessons = [
       "Introduction",
       "Setup Environment",
@@ -17,6 +50,8 @@ class CourseDetailPage extends StatelessWidget {
       "Layouts in Flutter",
       "Navigation",
     ];
+
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FB),
@@ -27,7 +62,7 @@ class CourseDetailPage extends StatelessWidget {
         elevation: 0,
 
         title: Text(
-          course["title"] ?? "Course Details",
+          widget.course["title"] ?? "Course Details",
           style: const TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
@@ -35,28 +70,24 @@ class CourseDetailPage extends StatelessWidget {
           ),
         ),
 
-        iconTheme: const IconThemeData(
-          color: Colors.black,
-        ),
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
 
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(18),
+        padding: EdgeInsets.all(screenWidth * 0.05),
 
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            // VIDEO PLACEHOLDER
+            // VIDEO
             Container(
               height: 220,
               width: double.infinity,
-
               decoration: BoxDecoration(
                 color: Colors.indigo.shade100,
                 borderRadius: BorderRadius.circular(20),
               ),
-
               child: const Center(
                 child: Icon(
                   Icons.play_circle_fill,
@@ -68,139 +99,156 @@ class CourseDetailPage extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // COURSE TITLE
             Text(
-              course["title"] ?? "No Title",
-
+              widget.course["title"] ?? "No Title",
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
               ),
             ),
 
             const SizedBox(height: 10),
 
-            // INSTRUCTOR
             Text(
-              "Instructor: ${course["instructor"] ?? "Unknown"}",
-
-              style: const TextStyle(
-                fontSize: 15,
-                color: Colors.grey,
-                fontWeight: FontWeight.w500,
-              ),
+              "Instructor: ${widget.course["instructor"] ?? "Unknown"}",
+              style: const TextStyle(color: Colors.grey),
             ),
 
             const SizedBox(height: 18),
 
-            // DESCRIPTION
             Text(
-              course["description"] ??
-                  "No description available for this course.",
+              widget.course["description"] ?? "",
+              style: const TextStyle(height: 1.5),
+            ),
 
-              style: const TextStyle(
-                fontSize: 15,
-                height: 1.5,
-                color: Colors.black87,
+            const SizedBox(height: 25),
+
+            // PROGRESS BAR (NEW)
+            LinearProgressIndicator(
+              value: progress,
+              minHeight: 10,
+              backgroundColor: Colors.grey.shade300,
+              valueColor: AlwaysStoppedAnimation(
+                progress == 1 ? Colors.green : Colors.indigo,
               ),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 10),
 
-            // LESSON TITLE
+            Text(
+              "${(progress * 100).toInt()}% completed",
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+
+            const SizedBox(height: 25),
+
             const Text(
               "Lessons",
-
               style: TextStyle(
                 fontSize: 21,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
               ),
             ),
 
             const SizedBox(height: 15),
 
-            // LESSON LIST
+            // LESSON LIST (UPDATED)
             Column(
-              children: lessons.map((lesson) {
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(14),
+              children: List.generate(lessons.length, (index) {
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      completedLessons[index] = !completedLessons[index];
+                    });
+                  },
 
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(14),
 
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.08),
-                        blurRadius: 8,
-                      ),
-                    ],
-                  ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
 
-                  child: Row(
-                    children: [
-
-                      // ICON BOX
-                      Container(
-                        height: 45,
-                        width: 45,
-
-                        decoration: BoxDecoration(
-                          color: Colors.indigo.shade100,
-                          borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.08),
+                          blurRadius: 8,
                         ),
+                      ],
+                    ),
 
-                        child: const Icon(
-                          Icons.play_arrow,
-                          color: Colors.indigo,
-                        ),
-                      ),
+                    child: Row(
+                      children: [
 
-                      const SizedBox(width: 14),
+                        Container(
+                          height: 45,
+                          width: 45,
 
-                      // LESSON TEXT
-                      Expanded(
-                        child: Text(
-                          lesson,
+                          decoration: BoxDecoration(
+                            color: completedLessons[index]
+                                ? Colors.green.shade100
+                                : Colors.indigo.shade100,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
 
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                          child: Icon(
+                            completedLessons[index]
+                                ? Icons.check
+                                : Icons.play_arrow,
+                            color: completedLessons[index]
+                                ? Colors.green
+                                : Colors.indigo,
                           ),
                         ),
-                      ),
-                    ],
+
+                        const SizedBox(width: 14),
+
+                        Expanded(
+                          child: Text(
+                            lessons[index],
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: completedLessons[index]
+                                  ? Colors.green
+                                  : Colors.black87,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
-              }).toList(),
+              }),
             ),
 
             const SizedBox(height: 30),
 
-            // COMPLETE BUTTON
+            // MAIN BUTTON (UPDATED)
             SizedBox(
               width: double.infinity,
               height: 55,
 
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  setState(() {
+                    for (int i = 0; i < completedLessons.length; i++) {
+                      completedLessons[i] = true;
+                    }
+                  });
+                },
 
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.indigo,
-
+                  backgroundColor: buttonColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
 
-                child: const Text(
-                  "Complete Lesson",
-
-                  style: TextStyle(
+                child: Text(
+                  buttonText,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
