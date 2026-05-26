@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'splash_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: 'https://fzsyotvrpwrjcjlbtgtjj.supabase.co',
+    anonKey:
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzeW90dnJwd3JpY2psYnRndGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3Nzg4NDksImV4cCI6MjA5NTM1NDg0OX0.42hb__Nkv8gmh5F0mc3AbRhkZ9_oxe_P6lHUBTw6FZo',
+  );
+
   runApp(const LMSApp());
 }
 
