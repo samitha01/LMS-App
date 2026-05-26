@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'home_page.dart';
 import 'signup_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -24,11 +25,33 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void login() {
-    if (_formKey.currentState!.validate()) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
+  Future<void> login() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    try {
+      final supabase = Supabase.instance.client;
+
+      final response = await supabase.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+
+      if (response.user != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Login failed")),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
       );
     }
   }
@@ -196,7 +219,9 @@ class _LoginPageState extends State<LoginPage> {
             width: double.infinity,
             height: 45,
             child: ElevatedButton(
-              onPressed: login,
+              onPressed: () {
+                login();
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF3D4FD6),
                 shape: RoundedRectangleBorder(
