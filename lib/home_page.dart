@@ -68,7 +68,7 @@ class _HomePageState extends State<HomePage> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.menu_book), label: "Courses"),
-          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: "Progress"),
+          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: "Assignments"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],
       ),
@@ -76,7 +76,7 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class DashboardView extends StatelessWidget {
+class DashboardView extends StatefulWidget {
   final Function(int) onNavigate;
 
   const DashboardView({
@@ -85,17 +85,29 @@ class DashboardView extends StatelessWidget {
   });
 
   @override
+  State<DashboardView> createState() => _DashboardViewState();
+}
+
+class _DashboardViewState extends State<DashboardView> {
+
+  bool isExpanded = false;
+
+  @override
   Widget build(BuildContext context) {
+
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // GREETING SECTION (RESTORED STYLE)
+
+          // GREETING SECTION
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Column(
+            children: const [
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -116,60 +128,71 @@ class DashboardView extends StatelessWidget {
                   ),
                 ],
               ),
-
               CircleAvatar(
                 radius: 24,
-                backgroundColor: Colors.indigo.shade100,
-                child: const Icon(
-                  Icons.person,
-                  color: Colors.indigo,
-                  size: 28,
-                ),
+                backgroundColor: Colors.indigo,
+                child: Icon(Icons.person, color: Colors.white),
               ),
             ],
           ),
 
           const SizedBox(height: 25),
 
-          // PROGRESS CARD (RESTORED STYLE)
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.indigo.shade900,
-                  Colors.indigo.shade700,
-                ],
+          // ANIMATED PROGRESS CARD
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                isExpanded = !isExpanded;
+              });
+            },
+
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.easeInOut,
+              width: double.infinity,
+              padding: EdgeInsets.all(isExpanded ? 28 : 20),
+
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [
+                    Colors.indigo,
+                    Colors.indigoAccent,
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(
+                  isExpanded ? 28 : 20,
+                ),
               ),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Course Progress",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Course Progress",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  "3 of 10 lessons completed",
-                  style: TextStyle(color: Colors.white70),
-                ),
-                const SizedBox(height: 18),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: const LinearProgressIndicator(
+
+                  SizedBox(height: 10),
+
+                  Text(
+                    "3 of 10 lessons completed",
+                    style: TextStyle(color: Colors.white70),
+                  ),
+
+                  SizedBox(height: 18),
+
+                  LinearProgressIndicator(
                     value: 0.3,
                     minHeight: 10,
                     backgroundColor: Colors.white24,
                     valueColor: AlwaysStoppedAnimation(Colors.white),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
 
@@ -201,11 +224,10 @@ class DashboardView extends StatelessWidget {
 
           const SizedBox(height: 30),
 
-          // CONTINUE LEARNING HEADER (RESTORED)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
+            children: const [
+              Text(
                 "Continue Learning",
                 style: TextStyle(
                   color: Colors.black,
@@ -213,17 +235,11 @@ class DashboardView extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
-              GestureDetector(
-                onTap: () {
-                  // see all disabled, connect later.
-                },
-                child: const Text(
-                  "See All",
-                  style: TextStyle(
-                    color: Colors.indigo,
-                    fontWeight: FontWeight.w600,
-                  ),
+              Text(
+                "See All",
+                style: TextStyle(
+                  color: Colors.indigo,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
@@ -236,16 +252,19 @@ class DashboardView extends StatelessWidget {
             lesson: "Lesson 4",
             progress: 0.7,
           ),
+
           const _CourseCard(
             title: "UI Design Principles",
             lesson: "Lesson 2",
             progress: 0.4,
           ),
+
           const _CourseCard(
             title: "Dart Fundamentals",
             lesson: "Lesson 6",
             progress: 0.8,
           ),
+
           const _CourseCard(
             title: "Firebase Authentication",
             lesson: "Lesson 1",
@@ -341,9 +360,7 @@ class _CourseCard extends StatelessWidget {
               size: 32,
             ),
           ),
-
           const SizedBox(width: 15),
-
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
